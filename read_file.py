@@ -1,5 +1,4 @@
 from collections import defaultdict
-from Point import Point
 
 # Hàm đọc file dạng nhiều dòng, mỗi dòng là transaction.
 # mỗi transaction chứa item.
@@ -58,39 +57,6 @@ def read_lines_to_floatlist(link, fileName, splitType) -> list:
     f.close()
     return List
 
-def read_lines_to_intlist(link, fileName, splitType) -> list:
-    f = open(link + '/' + fileName, 'r', encoding = 'utf-8')
-    List = list()
-    for line in f:
-        if line != '\n':
-            lineToAdd = line.rstrip().split(splitType)
-            ## [1, 2, 3] neu co [ ] thi moi dung 2 dong nay
-            # lineToAdd[0] = lineToAdd[0][1:]
-            # lineToAdd[-1] = lineToAdd[-1][:-1]
-            lineToInt = [int(numStr) for numStr in lineToAdd]
-            List.append(lineToInt)
-    f.close()
-    if len(List) == 1:
-        return list(sum(List, []))
-    return List
-
-def read_lines_to_listPoint(link, fileName, splitType) -> list:
-    f = open(link + '/' + fileName, 'r', encoding = 'utf-8')
-    List = list()
-    for line in f:
-        if line != '\n':
-            lineToAdd = line.rstrip().split(splitType)#[1:-1]
-            lineToAdd[0] = lineToAdd[0][1:]
-            lineToAdd[-1] = lineToAdd[-1][:-1]
-            lineToFloat = [float(numStr) for numStr in lineToAdd]
-            List.append(lineToFloat)
-    f.close()
-    listPoints = []
-    for vec in List:
-        listPoints.append(Point(vec))
-    return listPoints
-
-
 def read_lines_to_floatlist_nonSquareBracklets(link, fileName, splitType) -> list:
     f = open(link + '/' + fileName, 'r', encoding = 'utf-8')
     List = list()
@@ -105,6 +71,19 @@ def read_lines_to_floatlist_nonSquareBracklets(link, fileName, splitType) -> lis
     f.close()
     return List
 
+def read_lines_to_intlist_nonSquareBracklets(link, fileName, splitType) -> list:
+    f = open(link + '/' + fileName, 'r', encoding = 'utf-8')
+    List = list()
+    for line in f:
+        if line != '\n':
+            lineToAdd = line.rstrip().split(splitType)
+            # bỏ 2 cái ngoặc vuông
+            # lineToAdd[0] = lineToAdd[0][1:]
+            # lineToAdd[-1] = lineToAdd[-1][:-1]
+            lineToFloat = [int(numStr) for numStr in lineToAdd]
+            List.append(lineToFloat)
+    f.close()
+    return List
 
 def read_input_file_to_int(link, fileName) -> int:
     num = 0
@@ -122,3 +101,19 @@ def read_line_to_sentenceList(link, fileName, splitType) -> list:
             sentences.append(''.join(lineToAdd))
     f.close()
     return sentences
+
+def read_lines_to_intlist(link, fileName, splitType) -> list:
+    f = open(link + '/' + fileName, 'r', encoding = 'utf-8')
+    List = list()
+    for line in f:
+        if line != '\n':
+            lineToAdd = line.rstrip().split(splitType)
+            ## [1, 2, 3] neu co [ ] thi moi dung 2 dong nay
+            # lineToAdd[0] = lineToAdd[0][1:]
+            # lineToAdd[-1] = lineToAdd[-1][:-1]
+            lineToInt = [int(numStr) for numStr in lineToAdd]
+            List.append(lineToInt)
+    f.close()
+    if len(List) == 1:
+        return list(sum(List, []))
+    return List

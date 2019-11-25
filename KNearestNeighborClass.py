@@ -25,8 +25,9 @@ class KNearestNeighbor:
         self.distanceType = dType #1 euclid, 2 cosine..
         self.listDistances = []
 
-        self.labelPercent = []
+        self.labelPercent = {}
         self.dataInitSorted = []
+        self.labelCount = {}
 
         self.fileDir = './' + dataName
         self.outfileDir = './outfile/' + dataName + '/knn_vectorinput/'
@@ -53,13 +54,18 @@ class KNearestNeighbor:
         distances = list(distances)
         labels = list(labels)
         # get top k in dataInit
-        labelCount = [] # counting follow index
-        for iLabel in range(self.numOfLabel):
-            # labelCount.append(self.listLabel[:self.k].count(iLabel))
-            labelCount.append(labels[:self.k].count(iLabel))
-        self.labelPercent = []
-        for count in labelCount:
-            self.labelPercent.append(round((count / sum(labelCount))*100, 2))
+        labelSorted = []
+        for i in range(self.k):
+            labelSorted.append(labels[i])
+        self.labelCount = {}
+        for l in labelSorted:
+            if l not in self.labelCount:
+                self.labelCount[l] = 1
+            else:
+                self.labelCount[l] += 1
+        self.labelPercent = {}
+        for (label, count) in self.labelCount.items():
+            self.labelPercent[label] = round((count / self.k)*100, 2)
         # self.write_predict(newPoint.display())
         
     def write_dataInitSorted(self, indexSorted: list):
@@ -68,8 +74,8 @@ class KNearestNeighbor:
     def write_predict(self, newStr: str):
         predict = []
         predict.append(newStr)
-        for i in range(self.numOfLabel):
-            predict.append('{0} : {1}'.format(i, self.labelPercent[i]))
+        for (label,percent) in self.labelPercent.items():
+            predict.append('{0} : {1}'.format(label, percent))
         write_file.list_to_txt(predict, './outfile/' + self.fileName + '/', 'predict.out')
 
     def write_distance(self, distances: list, labels: list):

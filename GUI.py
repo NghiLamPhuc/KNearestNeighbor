@@ -87,7 +87,7 @@ class MyWindow(QtWidgets.QMainWindow):
                         words.append(token)
                 self.listSentToWord.append(words)
             # training word2vec cho cái list tách từ.
-            model = Word2Vec(self.listSentToWord, size=vectorSize, min_count=1)
+            model = Word2Vec(self.listSentToWord, size=vectorSize, window=5, sg=1, min_count=5, workers=5)
             model.save(linkModel)
             sent2vec = Sentence2Vec(linkModel)
             listVect = []
@@ -221,7 +221,7 @@ class MyWindow(QtWidgets.QMainWindow):
                 self.kNN.predict(newPoint)
                 self.kNN.write_predict(newSent)
                 exeTime = (datetime.now() - start).total_seconds()
-                self.labelLog.setText('{0}:{1} \t{2}'.format(self.kNN.labelPercent, set(self.kNN.listLabel), str(timedelta(seconds = exeTime))))
+                self.labelLog.setText('{0} \t{1}'.format(self.kNN.labelPercent, str(timedelta(seconds = exeTime))))
         elif self.checkDataType == DATASETS_IS_VECTOR:
             if not newSent:
                 self.labelLog.setText('Chưa nhập vector.')
@@ -235,7 +235,7 @@ class MyWindow(QtWidgets.QMainWindow):
                 self.kNN.predict(newPoint)
                 self.kNN.write_predict(newPoint.display())
                 exeTime = (datetime.now() - start).total_seconds()
-                self.labelLog.setText('{0}:{1} \t{2}'.format(self.kNN.labelPercent, set(self.kNN.listLabel), str(timedelta(seconds = exeTime))))
+                self.labelLog.setText('{0} \t{1}'.format(self.kNN.labelPercent, str(timedelta(seconds = exeTime))))
         self.btnKNNFile.setEnabled(True)
            
     def on_KNNFile_clicked(self):
