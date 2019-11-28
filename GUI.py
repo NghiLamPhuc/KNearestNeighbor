@@ -12,7 +12,6 @@ import sys
 DATASETS_IS_VECTOR = 1
 DATASETS_IS_TEXT = 0
 
-
 class MyWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(MyWindow, self).__init__()

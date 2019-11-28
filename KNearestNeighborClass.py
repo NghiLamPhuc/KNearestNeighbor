@@ -1,5 +1,5 @@
 from Point import Point
-import read_file, write_file, make_folder
+from FUNC_working_with_file import read_file, write_file, make_folder
 import underthesea
 import fasttext
 
@@ -21,7 +21,7 @@ class KNearestNeighbor:
         self.size = len(dataInit)
         self.k = int(k)
         self.listLabel = label
-        self.numOfLabel = len(set(label))
+        self.numOfLabel = len(label)
         self.distanceType = dType #1 euclid, 2 cosine..
         self.listDistances = []
 
@@ -41,16 +41,11 @@ class KNearestNeighbor:
         indexSorted = []
 
         for point in self.dataInitial:
-            # self.listDistances.append(newPoint.euclid_distance(point))
             distances.append(newPoint.euclid_distance(point))
-        # self.dataInitSorted = list(range(len(self.dataInitial)))
         indexSorted = list(range(len(self.dataInitial)))
-        # (self.listDistances, self.listLabel, self.dataInitSorted) = zip(*sorted(zip(self.listDistances, self.listLabel, self.dataInitSorted)))
         (distances, labels, indexSorted) = zip(*sorted(zip(distances, labels, indexSorted)))
         self.write_distance(distances, labels)
         self.write_dataInitSorted(indexSorted)
-        # self.listDistances = list(self.listDistances)
-        # self.listLabel = list(self.listLabel)
         distances = list(distances)
         labels = list(labels)
         # get top k in dataInit
@@ -69,55 +64,48 @@ class KNearestNeighbor:
         # self.write_predict(newPoint.display())
         
     def write_dataInitSorted(self, indexSorted: list):
-        write_file.list_to_txt(indexSorted, './outfile/' + self.fileName + '/', 'index_ascending.txt')
+        write_file.list_to_txt(indexSorted, 'outfile', 'index_ascending', '.txt', ', ')
     
     def write_predict(self, newStr: str):
         predict = []
         predict.append(newStr)
         for (label,percent) in self.labelPercent.items():
             predict.append('{0} : {1}'.format(label, percent))
-        write_file.list_to_txt(predict, './outfile/' + self.fileName + '/', 'predict.out')
+        write_file.list_to_txt(predict, 'outfile', 'predict', '.out', '\n')
 
     def write_distance(self, distances: list, labels: list):
         sortDisLabel = []
         # for i in range(self.size): # all distance
         for i in range(self.k): # top k distance
             sortDisLabel.append('{0} : {1}'.format(distances[i], labels[i]))
-        write_file.list_to_txt(sortDisLabel, './outfile/' + self.fileName + '/', 'distance_ascending.txt')
-
-    # a file == list of points
-    # def predict_a_file(self, points: list, k: int):
-    #     listResult = []
-    #     for p in points:
-    #         knn.predict(p)
-    #         listResult.append(p.display())
-    #         listResult.append(str(knn.labelPercent))
-        
-    #     write_file.list_to_txt(listResult, './outfile/' + fileName + '/', fileName + '.tested')
-
+        write_file.list_to_txt(sortDisLabel, 'outfile', 'distance_ascending', '.txt', '\n')
 
 def main():
-    linkDatasets = './datasets'
+    folderName = 'datasets'
     fileName = 'BTTrongLop'
+    fileType = ['.txt', '.vector', '.lb', '.vtest', '.vtested']
     ### KNN
     k = 3
     distanceType = 1
-    datasetsVect = read_file.read_lines_to_listPoint(linkDatasets, fileName + '.vector', ', ')
-    labels = read_file.read_lines_to_intlist(linkDatasets, fileName + '.lb', ', ')
+    # datasetsVect = read_file.read_lines_to_listPoint(linkDatasets, fileName + '.vector', ', ')
+    listVect = read_file.read_lineSplited_to_list(folderName, fileName, fileType[1], ', ', 1)
+    datasetsVect = [Point(vect) for vect in listVect]
+    labels = read_file.read_lineSplited_to_list(folderName, fileName, fileType[2], ', ', 1)
     knn = KNearestNeighbor(DATASETS_IS_VECTOR, datasetsVect, k, labels, distanceType, fileName)
-    # knn.predict(Point([1, 6]))
+    knn.predict(Point([1, 6]))
+    knn.write_predict(Point([1, 6]).display())
     # read file
-    vecs = read_file.read_lines_to_floatlist(linkDatasets, fileName + '.vtest', ', ')
-    # vect to point
-    points = [Point(vec) for vec in vecs]
-    # knn.predict_a_file(points, 5)
-    listResult = []
-    for p in points:
-        knn.predict(p)
-        listResult.append(p.display())
-        listResult.append(str(knn.labelPercent))
+    # vecTest = read_file.read_lineSplited_to_list(folderName, fileName, fileType[3], '\n', 1)
+    # # vect to point
+    # points = [Point(vec) for vec in vecTest]
+    # # knn.predict_a_file(points, 5)
+    # listResult = []
+    # for p in points:
+    #     knn.predict(p)
+    #     listResult.append(p.display())
+    #     listResult.append(str(knn.labelPercent))
     
-    write_file.list_to_txt(listResult, './outfile/' + fileName + '/', fileName + '.tested')
+    # write_file.list_to_txt(listResult, 'outfile', fileName, fileType[4], '\n')
     
 
 if __name__ == '__main__': main()

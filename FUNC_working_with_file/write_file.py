@@ -1,5 +1,5 @@
 'lamphucnghi@gmail.com'
-import make_folder
+from FUNC_working_with_file import make_folder
 
 INDEX_ROW_NO = 0
 INDEX_ROW_YES = 1
@@ -100,29 +100,32 @@ def list_to_txt_continuos(List: list, folderName: str, fileName: str, fileType: 
         fout.write('\n')
     return 1
 
+def test():
+    folderName = 'test_write'
+    fileType = '.txt'
+    a1 = [[0], [1], [2], [3], [4], [5]]
+    list_2hierachy_to_txt(a1, folderName, 'a1', fileType, ', ')
+
+    an = [[0,1,2], [2,3], [4,5,6]]
+    list_2hierachy_to_txt(an, folderName, 'an', fileType, ', ')
+
+    b = [0,1,2,3,4,5]
+    list_to_txt(b, folderName, 'b', fileType, ', ')
+
+    c = {'0':[0,1,2],'a':[1,2,3],'b':[8,9,1]}
+    dict_valueList_to_txt(c, folderName, 'c', fileType, ', ')
+
+    d = {'a':1,'b':2,'c':3}
+    if dict_to_txt(d, folderName, 'd', fileType) == 1:
+        print('dict wrote!')
+
+    e = [1,2,3,4,5]
+    for _ in range(10):
+        list_to_txt_continuos(e, folderName, 'e', fileType, ', ')
+
 def main():
-    print('writefile')
-    # a1 = [[0], [1], [2], [3], [4], [5]]
-    # list_2hierachy_to_txt(a1, 'test_write', 'a1', '.txt', ', ')
-
-    # an = [[0,1,2], [2,3], [4,5,6]]
-    # list_2hierachy_to_txt(an, 'test_write', 'an', '.txt', ', ')
-
-    # b = [0,1,2,3,4,5]
-    # list_to_txt(b, 'test_write', 'b', '.txt', ', ')
-
-    # c = {'0':[0,1,2],'a':[1,2,3],'b':[8,9,1]}
-    # dict_valueList_to_txt(c, 'test_write', 'c', '.txt', ', ')
-
-    # d = {'a':1,'b':2,'c':3}
-    # if dict_to_txt(d, 'test_write', 'd', '.txt') == 1:
-    #     print('dict wrote!')
-
-    # e = [1,2,3,4,5]
-    # for _ in range(10):
-    #     list_to_txt_continuos(e, 'test_write', 'e', '.txt', ', ')
-
-
+    print('test')
+    
 
 
 if __name__ == "__main__": main()

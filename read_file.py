@@ -1,9 +1,16 @@
+'lamphucnghi@gmail.com'
 from collections import defaultdict
 
-# Hàm đọc file dạng nhiều dòng, mỗi dòng là transaction.
-# mỗi transaction chứa item.
-def read_input_file_to_dict(link, fileName, splitType) -> dict:
-    f = open(link + fileName, 'r', encoding = 'utf-8')
+TYPE_OF_RESULT_LIST_IS_TEXT = 0
+TYPE_OF_RESULT_LIST_IS_INT = 1
+TYPE_OF_RESULT_LIST_IS_FLOAT = 2
+TYPE_OF_RESULT_LIST_IS_SENTENCE = 3
+
+'''
+hàm này chưa cần. Sửa sau.
+'''
+def read_line_to_dict(folderName: str, fileName: str, fileType: str, splitType: str) -> dict:
+    f = open('./{0}/{1}{2}'.format(folderName, fileName, fileType), 'r', encoding = 'utf-8')
     inpDict = defaultdict(dict)
     i = 0
     for line in f:
@@ -11,10 +18,15 @@ def read_input_file_to_dict(link, fileName, splitType) -> dict:
         i += 1
     f.close()
     return inpDict
-# Hàm đọc file dạng nhiều dòng, mỗi dòng là transaction.
-# Cột đầu tiên là tên transaction.
-def read_input_file_with_row_name_to_dict(link, fileName, splitType) -> dict:
-    f = open(link + fileName, 'r', encoding = 'utf-8')
+
+'''
+reading a file as:
+key abc a b das wf sds ...
+line[0] play as key.
+value is a list.
+'''
+def read_line_to_dict_key_first_value_list(folderName: str, fileName: str, fileType: str, splitType: str) -> dict:
+    f = open('./{0}/{1}{2}'.format(folderName, fileName, fileType), 'r', encoding = 'utf-8')
     inpDict = defaultdict(dict)
     for line in f:
         lineToList = line.rstrip().split(splitType)
@@ -24,96 +36,46 @@ def read_input_file_with_row_name_to_dict(link, fileName, splitType) -> dict:
     f.close()
     return inpDict
 
-def str_to_dict(file: str, splitType) -> dict:
-    inpDict = defaultdict(dict)
-    strToList = file.rstrip().split('\n')
-    for line in strToList:
-        lineToList = line.rstrip().split(splitType)
-        rowName = lineToList[0]
-        items = lineToList[1:]
-        inpDict[rowName] = sorted(items)
-    return inpDict
+'''
+Reading a file like:
+[0.1 0.2 0.3....]
 
-def read_lines_to_list(link, fileName, splitType) -> list:
-    f = open(link + '/' + fileName, 'r', encoding = 'utf-8')
+'''
+def read_lineSplited_to_list(folderName: str, fileName: str, fileType: str, splitType: str, outListType: int) -> list:
+    f = open('./{0}/{1}{2}'.format(folderName, fileName, fileType), 'r', encoding = 'utf-8')
     List = list()
     for line in f:
         if line != '\n':
-            lineToAdd = line.rstrip().split(splitType)
-            List.append(lineToAdd)
+            if outListType == TYPE_OF_RESULT_LIST_IS_SENTENCE:
+                List.append(line.rstrip())
+            else:
+                lineToStrList = line.rstrip().split(splitType)
+                if lineToStrList[0][0] == '[':
+                    lineToStrList[0] = lineToStrList[0][1:]
+                    lineToStrList[-1] = lineToStrList[-1][:-1]
+                if outListType == TYPE_OF_RESULT_LIST_IS_TEXT:
+                    List.append(lineToStrList)
+                elif outListType == TYPE_OF_RESULT_LIST_IS_INT:
+                    List.append([int(x) for x in lineToStrList])
+                elif outListType == TYPE_OF_RESULT_LIST_IS_FLOAT:
+                    List.append([float(x) for x in lineToStrList])
+            
     f.close()
     return List
+'''
+We have a [L]ist with each item is a [l]ist.
+We want to merge all item of all [l]ist to [L]ist.
+[[0, 1, 2], [1, 2, 3]] --> [0, 1, 2, 1, 2, 3]
+'''
+def convert_twoHierachyList_to_oneList(inpList: list(list())) -> list:
+    return list(sum(inpList, []))
 
-def read_lines_to_floatlist(link, fileName, splitType) -> list:
-    f = open(link + '/' + fileName, 'r', encoding = 'utf-8')
-    List = list()
-    for line in f:
-        if line != '\n':
-            lineToAdd = line.rstrip().split(splitType)#[1:-1]
-            lineToAdd[0] = lineToAdd[0][1:]
-            lineToAdd[-1] = lineToAdd[-1][:-1]
-            lineToFloat = [float(numStr) for numStr in lineToAdd]
-            List.append(lineToFloat)
-    f.close()
-    return List
+def main():
+    print('readfile')
+    # folderName = 'datasets'
+    # fileName = 'giao_thong'
+    # fileType = '.txt'
+    # a = read_lineSplited_to_list(folderName, fileName, fileType, ' ', 3)
+    # print(a[0])
 
-def read_lines_to_floatlist_nonSquareBracklets(link, fileName, splitType) -> list:
-    f = open(link + '/' + fileName, 'r', encoding = 'utf-8')
-    List = list()
-    for line in f:
-        if line != '\n':
-            lineToAdd = line.rstrip().split(splitType)#[1:-1]
-            # bỏ 2 cái ngoặc vuông
-            # lineToAdd[0] = lineToAdd[0][1:]
-            # lineToAdd[-1] = lineToAdd[-1][:-1]
-            lineToFloat = [float(numStr) for numStr in lineToAdd]
-            List.append(lineToFloat)
-    f.close()
-    return List
-
-def read_lines_to_intlist_nonSquareBracklets(link, fileName, splitType) -> list:
-    f = open(link + '/' + fileName, 'r', encoding = 'utf-8')
-    List = list()
-    for line in f:
-        if line != '\n':
-            lineToAdd = line.rstrip().split(splitType)
-            # bỏ 2 cái ngoặc vuông
-            # lineToAdd[0] = lineToAdd[0][1:]
-            # lineToAdd[-1] = lineToAdd[-1][:-1]
-            lineToFloat = [int(numStr) for numStr in lineToAdd]
-            List.append(lineToFloat)
-    f.close()
-    return List
-
-def read_input_file_to_int(link, fileName) -> int:
-    num = 0
-    f = open(link + fileName, 'r', encoding = 'utf-8')
-    num = int(f.read())
-    f.close()
-    return num
-
-def read_line_to_sentenceList(link, fileName, splitType) -> list:
-    f = open(link + '/' + fileName, 'r', encoding = 'utf-8')
-    sentences = list()
-    for line in f:
-        if line != '\n':
-            lineToAdd = line.rstrip().split(splitType)
-            sentences.append(''.join(lineToAdd))
-    f.close()
-    return sentences
-
-def read_lines_to_intlist(link, fileName, splitType) -> list:
-    f = open(link + '/' + fileName, 'r', encoding = 'utf-8')
-    List = list()
-    for line in f:
-        if line != '\n':
-            lineToAdd = line.rstrip().split(splitType)
-            ## [1, 2, 3] neu co [ ] thi moi dung 2 dong nay
-            # lineToAdd[0] = lineToAdd[0][1:]
-            # lineToAdd[-1] = lineToAdd[-1][:-1]
-            lineToInt = [int(numStr) for numStr in lineToAdd]
-            List.append(lineToInt)
-    f.close()
-    if len(List) == 1:
-        return list(sum(List, []))
-    return List
+if __name__ == "__main__": main()
