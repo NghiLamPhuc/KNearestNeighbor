@@ -1,3 +1,7 @@
+'''
+A Point has list of coordinate.
+
+'''
 class Point:
     def __init__(self, coordinit: list):
         self.coord = coordinit
@@ -32,6 +36,10 @@ class Point:
         coordStr += str(self.coord[-1])
         return ''.join(coordStr)
 
+'''
+P1 P2 P3 P4 ...
+Finding a point by calculate average coordinate of all P.
+'''
 def calculate_midpoint_of_list(listPoints: list) -> list():
     midpoint = list()
     pointSize = listPoints[0].size
@@ -41,11 +49,34 @@ def calculate_midpoint_of_list(listPoints: list) -> list():
             curr += point.coord[iCoord]
         midpoint.append(curr/len(listPoints))
     return Point(midpoint)
-        
+
+'''
+if two point is one -> 1
+else                -> 0
+'''
 def compare_two_point(a: Point, b: Point) -> int:
     if a.size != b.size:
         return 0
+    sumDifferent = 0
     for iCoordA in range(len(a.coord)):
-        if a.coord[iCoordA] - b.coord[iCoordA] != 0:
-            return 0
+        sumDifferent += a.coord[iCoordA] - b.coord[iCoordA]
+    if sumDifferent == 0:
+        return 0
     return 1
+
+def testCompare():
+    a = Point([1,2,3])
+    b = Point([1,2,4])
+    c = Point([1,2,3])
+    print('a.[{0}]'.format(a.display()))
+    print('b.[{0}]'.format(b.display()))
+    print('c.[{0}]'.format(c.display()))
+    if compare_two_point(a, c) == 0:
+        print('a is c')
+    if compare_two_point(a, b) == 1:
+        print('a not b')
+
+def main():
+    testCompare()
+
+if __name__=="__main__": main()
