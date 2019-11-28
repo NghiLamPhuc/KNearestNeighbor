@@ -92,19 +92,18 @@ def main():
     datasetsVect = [Point(vect) for vect in listVect]
     labels = read_file.read_lineSplited_to_list(folderName, fileName, fileType[2], ', ', 1)
     knn = KNearestNeighbor(DATASETS_IS_VECTOR, datasetsVect, k, labels, distanceType, fileName)
-    knn.predict(Point([1, 6]))
-    knn.write_predict(Point([1, 6]).display())
+    ### test predict a vector
+    # knn.predict(Point([1, 6]))
+    # knn.write_predict(Point([1, 6]).display())
     # read file
-    # vecTest = read_file.read_lineSplited_to_list(folderName, fileName, fileType[3], '\n', 1)
-    # # vect to point
+    ### test predict a list vector
+    # vecTest = read_file.read_lineSplited_to_list(folderName, fileName, fileType[3], ', ', 1)
     # points = [Point(vec) for vec in vecTest]
-    # # knn.predict_a_file(points, 5)
     # listResult = []
     # for p in points:
     #     knn.predict(p)
     #     listResult.append(p.display())
     #     listResult.append(str(knn.labelPercent))
-    
     # write_file.list_to_txt(listResult, 'outfile', fileName, fileType[4], '\n')
     
 
