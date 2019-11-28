@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
-import read_file, write_file, make_folder
+from FUNC_working_with_file import read_file, write_file, make_folder
 from KNearestNeighborClass import KNearestNeighbor
 from Point import Point
 from gensim.models import Word2Vec
@@ -11,6 +11,10 @@ import sys
 
 DATASETS_IS_VECTOR = 1
 DATASETS_IS_TEXT = 0
+
+GROUPBOX_KNN = 10
+GROUPBOX_VECTOR = 11
+GROUPBOX_INPUT = 12
 
 class MyWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -53,7 +57,9 @@ class MyWindow(QtWidgets.QMainWindow):
         self.listRawSents = list()
         self.listSentToWord = list()
         self.initData = None
-        self.inputDir = './datasets'
+        self.folderDatasetsName = 'datasets'
+        self.folderOutfileName = 'outfile'
+        self.folderVectorize = 'vectorize'
         self.fileInitName = None
         self.checkKNN = 0
         self.kNN = None
@@ -74,9 +80,8 @@ class MyWindow(QtWidgets.QMainWindow):
         if len(self.listRawSents) == 0:
             self.labelLog.setText('Chưa có câu.')
         else:
-            linkFolder = 'outfile/{0}'.format(self.fileInitName)
-            make_folder.create_folder(linkFolder)
-            linkModel = linkFolder + '/word2vec.model'
+            make_folder.create_folder(self.folderVectorize)
+            linkModel = './' + self.folderVectorize + '/word2vec.model'
             # token sentences --> to list
             for sent in self.listRawSents:
                 tokens = word_tokenize(sent, format='text').split()
@@ -92,104 +97,118 @@ class MyWindow(QtWidgets.QMainWindow):
             listVect = []
             for sent in self.listRawSents:
                 listVect.append(sent2vec.get_vector(sent).tolist())
-            write_file.list_to_txt(listVect, linkFolder, 'Sent2Vect.txt')
-            write_file.list_to_txt(self.listSentToWord, linkFolder, 'WordTokenize.txt')
+            write_file.list_to_txt(listVect, self.folderDatasetsName, self.fileInitName, '.vector', '\n')
+            write_file.list_to_txt(self.listSentToWord, self.folderOutfileName, 'WordTokenize', '.txt', '\n')
 
-            self.checkVectorize = 1
-            self.groupBoxKNN.setEnabled(True)
-            self.lineEditPredict.setEnabled(True)
+            self.checkVectorize = DATASETS_IS_VECTOR
         exeTime = (datetime.now() - start).total_seconds()
         self.labelLog.setText('Đã lưu file vector. \t{0}'.format(str(timedelta(seconds = exeTime))))
-            
-            
+
+        self.enable_group([self.groupBoxKNN])
+        self.enable_editText([self.lineEditPredict])
+                 
     def on_text_predict_changed(self):
         self.labelLog.clear()
+        self.labelLog2.clear()
 
     def on_Export_clicked(self):
         inputDir = './datasets/'
-        (dataPath, _) = QtWidgets.QFileDialog.getSaveFileName(None, 'Save File', inputDir, '*.txt')
+        (dataPath, _) = QtWidgets.QFileDialog.getSaveFileName(None, 'Save File', inputDir, '*')
         if dataPath:
             data = self.plainTextInput.toPlainText()
             with open(dataPath, 'w', encoding = 'utf-8') as f:
                 f.write(data)
 
-    def on_Import_clicked(self):
-        self.labelLog.clear()
-        self.labelInput.clear()
+    def reset_all_editText(self):
         self.plainTextInput.clear()
+        self.labelInput.clear()
         self.lineEditPredict.clear()
-        self.groupBoxVectorize.setEnabled(False)
-        self.groupBoxKNN.setEnabled(False)
-        self.lineEditPredict.clear()
-        self.lineEditPredict.setEnabled(False)
-        self.btnKNNFile.setEnabled(False)
+        self.labelLog.clear()
+        self.labelInputName.setText('Dữ liệu')
+        self.labelLog2.clear()
+
+    def enable_editText(self, listObj: list):
+        for o in listObj:
+            o.setEnabled(True)
+
+    def disable_editText(self, listObj: list):
+        for o in listObj:
+            o.setEnabled(False)
+    
+    def enable_group(self, listGroupObj: list):
+        for g in listGroupObj:
+            g.setEnabled(True)
+            
+    def disable_group(self, listGroupObj: list):
+        for g in listGroupObj:
+            g.setEnabled(False)
+
+    def on_Import_clicked(self):
+        self.reset_all_editText()
+        self.disable_group([self.groupBoxVectorize, self.groupBoxKNN])
+
+        order = DATASETS_IS_TEXT
         self.checkDataType = DATASETS_IS_TEXT #0
+        self.checkVectorize = DATASETS_IS_TEXT
         if self.radioVector.isChecked():
             self.checkDataType = DATASETS_IS_VECTOR#1
+            self.checkVectorize = DATASETS_IS_VECTOR
+            order = DATASETS_IS_VECTOR
         
-        self.checkVectorize = 0
-        if self.radioVector.isChecked():
-            self.checkDataType = 1
+        dataType = ['.txt', '.vector', '.lb']
+        splitType = [', ', '\n']
+        toGetFileName = [-4, -7] #ex: file1[.txt] -4 file2[.vector] -7
         
-        # ###################################### input la text
-        if self.checkDataType == DATASETS_IS_TEXT:
-            (dataPath, _) = QtWidgets.QFileDialog.getOpenFileName(None, 'Open File', self.inputDir, '*.txt')
-            self.fileInitName = ''.join(list(dataPath.split('/')[-1])[:-4])
-            if dataPath:
-                # câu thô.
-                self.listLabel = read_file.read_lines_to_intlist(self.inputDir, self.fileInitName + '.lb', ', ')
-                
-                self.listRawSents = read_file.read_line_to_sentenceList(self.inputDir, self.fileInitName + '.txt', '\n')
+        (dataPath, _) = QtWidgets.QFileDialog.getOpenFileName(None, 'Open File', './' + self.folderDatasetsName, '*' + dataType[order])
+        self.fileInitName = ''.join(list(dataPath.split('/')[-1])[:int(toGetFileName[order])])
+        if dataPath:
+            rowCount = 0
+            # reading labels.
+            self.listLabel = read_file.read_lineSplited_to_list(self.folderDatasetsName, self.fileInitName, dataType[2], splitType[0], 1)
+            ################# TEXT INPUT            
+            if self.checkDataType == DATASETS_IS_TEXT:
+                # reading sentences.
+                self.listRawSents = read_file.read_lineSplited_to_list(self.folderDatasetsName, self.fileInitName, dataType[0], splitType[1], 3)
                 rowCount = len(self.listRawSents)
+                # display to qplainText
                 for i in range(rowCount):
                     rowStr = '[{0}]. {1} : {2}\n'.format(i, self.listRawSents[i], self.listLabel[i])
                     self.plainTextInput.insertPlainText(rowStr)
-
-                self.labelInput.setText('Có {} dòng.'.format(rowCount) )
-                self.labelInputName.setText(self.fileInitName)
-                self.spinBoxK.setMaximum(rowCount)
-
-                self.groupBoxVectorize.setEnabled(True)
-            else:
-                self.lineEditPredict.setPlaceholderText('')
-
-        # #################################### input la vector
-        elif self.checkDataType == DATASETS_IS_VECTOR:
-            (dataPath, _) = QtWidgets.QFileDialog.getOpenFileName(None, 'Open File', self.inputDir, '*.vector')
-            self.fileInitName = ''.join(list(dataPath.split('/')[-1])[:-7])
-            if dataPath:
-                # data đã số hóa.
-                self.listLabel = read_file.read_lines_to_intlist(self.inputDir, self.fileInitName + '.lb', ', ')
-
-                listVect = read_file.read_lines_to_floatlist(self.inputDir, self.fileInitName + '.vector', ', ' )
+            ################ VECTOR INPUT
+            elif self.checkDataType == DATASETS_IS_VECTOR:
+                # reading vectors.
+                listVect = read_file.read_lineSplited_to_list(self.folderDatasetsName, self.fileInitName, dataType[1], splitType[0], 2)
+                # convert vectors list to Point list.
                 toPoints = []
                 for vec in listVect:
                     toPoints.append(Point(vec))
                 self.initData = toPoints
-
+                
                 rowCount = len(self.initData)
+                # display to qplainText
                 for (i, row) in enumerate(self.initData):
                     rowStr = '[{0}]. {1} : {2}\n'.format(i, row.display(), self.listLabel[i])
                     self.plainTextInput.insertPlainText(rowStr)
-                
-                self.labelInput.setText('Có {} dòng.'.format(rowCount) )
-                self.labelInputName.setText(self.fileInitName)
-                self.spinBoxK.setMaximum(rowCount)
 
-                self.groupBoxKNN.setEnabled(True)
-                self.lineEditPredict.setEnabled(True)
-                hint = 'Nhập tọa độ vector.'
-                self.lineEditPredict.setPlaceholderText(hint)
-            else:
-                self.lineEditPredict.setPlaceholderText('')
-    
+            self.labelInput.setText('Có {} dòng.'.format(rowCount))
+            self.labelInputName.setText(self.fileInitName)
+            self.spinBoxK.setMaximum(rowCount)
+            if self.checkDataType == DATASETS_IS_TEXT:
+                self.enable_group([self.groupBoxVectorize])
+            elif self.checkDataType == DATASETS_IS_VECTOR:
+                self.enable_group([self.groupBoxKNN])
+                self.enable_editText([self.lineEditPredict])
+                
+        # else: # cancel open file.
+        #     self.lineEditPredict.setPlaceholderText('')
+                    
     def on_KNN_clicked(self):
         start = datetime.now()
         k = int(self.spinBoxK.text())
         ##################################### neu input la text
         if self.checkDataType == DATASETS_IS_TEXT:
             # đọc initData từ Sent2Vect.txt
-            sent2vect = read_file.read_lines_to_floatlist('./outfile/{0}/'.format(self.fileInitName), 'Sent2Vect.txt', ', ' )
+            sent2vect = read_file.read_lineSplited_to_list(self.folderDatasetsName, self.fileInitName, '.vector', ', ', 2)
             toPoints = []
             for vec in sent2vect:
                 toPoints.append(Point(vec))
@@ -200,20 +219,18 @@ class MyWindow(QtWidgets.QMainWindow):
         #     dType = 2
         
         self.kNN = KNearestNeighbor(self.checkDataType, self.initData, k, self.listLabel, dType, self.fileInitName)
-        
         ######################## input la vector
         self.checkKNN = 1
         
         ## Predict new from lineEditPredict
         newSent = self.lineEditPredict.text()
-        
         if self.checkDataType == DATASETS_IS_TEXT:
             if not newSent:
                 self.labelLog.setText('Chưa nhập câu.')
             elif self.checkKNN == 0:
                 self.labelLog.setText('Chưa phân lớp.')
             else:
-                linkModel = './outfile/{0}/word2vec.model'.format(self.fileInitName)
+                linkModel = './vectorize/word2vec.model'
                 sent2vec = Sentence2Vec(linkModel)
                 vecSentList = sent2vec.get_vector(newSent).tolist()
                 newPoint = Point(vecSentList)
@@ -235,6 +252,7 @@ class MyWindow(QtWidgets.QMainWindow):
                 self.kNN.write_predict(newPoint.display())
                 exeTime = (datetime.now() - start).total_seconds()
                 self.labelLog.setText('{0} \t{1}'.format(self.kNN.labelPercent, str(timedelta(seconds = exeTime))))
+        self.labelLog2.setText('0 neutral, 1 positive, -1 negative.')
         self.btnKNNFile.setEnabled(True)
            
     def on_KNNFile_clicked(self):
