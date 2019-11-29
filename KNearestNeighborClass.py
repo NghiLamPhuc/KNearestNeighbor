@@ -29,11 +29,9 @@ class KNearestNeighbor:
         self.dataInitSorted = []
         self.labelCount = {}
 
-        self.fileDir = './' + dataName
-        self.outfileDir = './outfile/' + dataName + '/knn_vectorinput/'
-        if dataInitType == DATASETS_IS_TEXT:
-            self.outfileDir = './outfile/' + dataName + '/knn_textinput/'
         self.fileName = dataName
+        self.folderDatasets = 'datasets'
+        self.folderOutfile = 'outfile'
     
     def predict(self, newPoint: Point):
         distances = []
@@ -64,21 +62,21 @@ class KNearestNeighbor:
         # self.write_predict(newPoint.display())
         
     def write_dataInitSorted(self, indexSorted: list):
-        write_file.list_to_txt(indexSorted, 'outfile', 'index_ascending', '.txt', ', ')
+        write_file.list_to_txt(indexSorted, self.folderOutfile, 'index_ascending', '.txt', ', ')
     
     def write_predict(self, newStr: str):
         predict = []
         predict.append(newStr)
         for (label,percent) in self.labelPercent.items():
             predict.append('{0} : {1}'.format(label, percent))
-        write_file.list_to_txt(predict, 'outfile', 'predict', '.out', '\n')
+        write_file.list_to_txt(predict, self.folderOutfile, 'predict', '.out', '\n')
 
     def write_distance(self, distances: list, labels: list):
         sortDisLabel = []
         # for i in range(self.size): # all distance
         for i in range(self.k): # top k distance
             sortDisLabel.append('{0} : {1}'.format(distances[i], labels[i]))
-        write_file.list_to_txt(sortDisLabel, 'outfile', 'distance_ascending', '.txt', '\n')
+        write_file.list_to_txt(sortDisLabel, self.folderOutfile, 'k_distance_ascending', '.txt', '\n')
 
 def main():
     folderName = 'datasets'
