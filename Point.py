@@ -1,8 +1,8 @@
-'''
-A Point has list of coordinate.
-
-'''
 class Point:
+    '''
+    A Point has list of coordinate.
+
+    '''
     def __init__(self, coordinit: list):
         self.coord = coordinit
         self.size = len(coordinit)
@@ -36,11 +36,11 @@ class Point:
         coordStr += str(self.coord[-1])
         return ''.join(coordStr)
 
-'''
-P1 P2 P3 P4 ...
-Finding a point by calculate average coordinate of all P.
-'''
 def calculate_midpoint_of_list(listPoints: list) -> list():
+    '''
+    P1 P2 P3 P4 ...
+    Finding a point by calculate average coordinate of all P.
+    '''
     midpoint = list()
     pointSize = listPoints[0].size
     for iCoord in range(pointSize):
@@ -50,11 +50,11 @@ def calculate_midpoint_of_list(listPoints: list) -> list():
         midpoint.append(curr/len(listPoints))
     return Point(midpoint)
 
-'''
-if two point is one -> 1
-else                -> 0
-'''
 def compare_two_point(a: Point, b: Point) -> int:
+    '''
+    if two point is one -> 1
+    else                -> 0
+    '''
     if a.size != b.size:
         return 0
     sumDifferent = 0
@@ -77,6 +77,7 @@ def testCompare():
         print('a not b')
 
 def main():
-    testCompare()
+    # testCompare()
+    print(Point.__doc__)
 
 if __name__=="__main__": main()

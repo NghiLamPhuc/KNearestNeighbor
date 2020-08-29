@@ -1,7 +1,7 @@
 from Point import Point
 from FUNC_working_with_file import read_file, write_file, make_folder
 import underthesea
-import fasttext
+# import fasttext
 
 DATASETS_IS_VECTOR = 1
 DATASETS_IS_TEXT = 0
